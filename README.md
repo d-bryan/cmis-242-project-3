@@ -86,7 +86,7 @@ The Program Core should contain the main method. It should generate the GUI show
 - The combo-box for the Fill Type should also allow two choices, either Hollow or Solid. 
 - The combo-box for the Color should allow seven choices, Black, Red, Orange, Yellow, Green, Blue, or Magenta.
 
-![GUI Example](/Users/dylan/dev/UMGC/cmis-242/CMIS242DesignPRJ3BryanD/project-text-documents/gui-example.png)
+![GUI Example](project-text-documents/gui-example.png)
 
 Clicking the Draw button should first check whether any non-integer values have been entered 
 in any of the fields that require integers. If so, an error message should be displayed in a JOptionPane 
