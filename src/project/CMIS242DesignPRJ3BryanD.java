@@ -1,187 +1,170 @@
+/*******************************************************************************
+ * File: CMIS242DesignPRJ3BryanD.java
+ * Author: Dylan Bryan
+ * Date: 10/3/20, 10:34 AM
+ * Purpose: Demonstrate the ability to create graphics objects
+ * with the use of a Graphical User Interface
+ ******************************************************************************/
+
 package project;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class CMIS242DesignPRJ3BryanD {
 
-  /** Abstract Shape Class - Extends Rectangle class */
-  public abstract static class Shape extends Rectangle {
+  /**
+   * Abstract Shape class
+   */
+  public static abstract class Shape extends Rectangle {
     private final Color color;
     private final boolean solid;
-    private static int count = 0;
-//    private Dimension d;
+    private static int count;
 
-    /**
-     * Creates a new {@code Shape} Object which is used as
-     * the base shape for subclasses
-     * @param rectangle RECTANGLE 2D rectangle object
-     * @param color COLOR sRGB color value of {@code Shape} Object
-     * @param solid BOOLEAN true/false value whether shape is solid or hollow
-     */
     public Shape(Rectangle rectangle, Color color, boolean solid) {
       super(rectangle);
       this.color = color;
       this.solid = solid;
-      Shape.count++;
+      // ensure that width and height are less than 200 for increment of shape
+      if (rectangle.width < 200 && rectangle.height < 200) {
+        Shape.count++;
+      } // end if statement
     } // end Shape constructor
 
     /**
-     * Set the color for the next drawn operation to
-     * the color of the current shape
-     * @param graphics GRAPHICS graphics object
+     * sets the color for the current shape
+     * @param g GRAPHICS graphic object
      */
-    public void setColor(Graphics graphics) {
-      // TODO: Set the color for the next drawn operation to the color of the current shape
-      graphics.setColor(this.color);
+    public void setColor(Graphics g) {
+      g.setColor(this.color);
     } // end setColor method
 
     /**
-     * Checks to see if the object is solid or hollow
-     * @return BOOLEAN solid or hollow object
+     * checks to see if shape is solid
+     * @return BOOLEAN true/false
      */
     public boolean getSolid() {
-      // if solid is true the object is solid
-      // else the object is hollow
-      return (this.solid == true) ? true : false;
+      return this.solid == true ? true : false;
     } // end getSolid method
 
     /**
-     * @return INT The total number of Shapes created so far * excluding processing errors,
-     *     such as an entry that is * not an integer.
+     * Gets the total number of shapes made so far
+     * @return INT number of shapes
      */
-    public static int getNoOfShapes() {
-      return count;
-    } // end getNoOfShapes method
+    public static int getNumberOfShapes() {
+      return Shape.count;
+    }
 
-    /**
-     * Draw method for parameters of graphic object
-     * @param graphics GRAPHICS graphic object
-     */
-    public abstract void draw(Graphics graphics);
+    // draw method for parameters of graphics object
+    public abstract void draw(Graphics g);
 
-  } // end Shape class
+  } // end abstract class Shape
 
-  /** Oval Class - Extends Shape Class */
+  /**
+   * Oval class
+   */
   public static class Oval extends Shape {
 
-    /**
-     * Creates a new Oval {@code Shape} Object
-     * @param rectangle RECTANGLE 2D rectangle object
-     * @param color COLOR sRGB color value of {@code Shape} Object
-     * @param solid BOOLEAN true/false value whether shape is solid or hollow
-     */
     public Oval(Rectangle rectangle, Color color, boolean solid) {
       super(rectangle, color, solid);
-      // TODO: Need four parameters for this constructor
-    } // end constructor
+    } // end Oval constructor
 
-    // override for drawing oval
     @Override
-    public void draw(Graphics graphics) {
-      // TODO: implement draw method for Oval class
-      graphics.create(this.x, this.y, this.width, this.height);
-    } // end draw method Oval
+    public void draw(Graphics g) {
+      g.drawOval(this.x, this.y, this.width, this.height);
+      g.setColor(super.color);
+      // if oval is solid
+      if (super.getSolid()) {
+        g.fillOval(this.x, this.y, this.width, this.height);
+      } // end if statement
+    } // end draw oval method
+
   } // end Oval class
 
-  /** Rectangular class - Extends Shape Class */
+  /**
+   * Rectangular class
+   */
   public static class Rectangular extends Shape {
 
-    /**
-     * Creates a new Rectangular {@code Shape} Object
-     * @param rectangle RECTANGLE 2D rectangle object
-     * @param color COLOR sRGB color value of {@code Shape} Object
-     * @param solid BOOLEAN true/false value whether shape is solid or hollow
-     */
     public Rectangular(Rectangle rectangle, Color color, boolean solid) {
       super(rectangle, color, solid);
-      // TODO: need four parameters for this constructor
-    } // end constructor
+    } // end rectangular constructor
 
-    // override for drawing rectangle
     @Override
-    public void draw(Graphics graphics) {
-      // TODO: implement draw method for Rectangular
-      graphics.create(this.x, this.y, this.width, this.height);
-    } // end draw method Rectangular
+    public void draw(Graphics g) {
+      g.drawRect(this.x, this.y, this.width, this.height);
+      g.setColor(super.color);
+      // if rectangle is solid
+      if (super.getSolid()) {
+        g.fillRect(this.x, this.y, this.width, this.height);
+      } // end if statement
+    } // end draw rectangular shape
+
   } // end Rectangular class
 
-  /** Drawing Class - Extends JPanel */
+  /**
+   * Drawing class
+   */
   public static class Drawing extends JPanel {
+    public ControllerLogic logic;
     private Shape shape;
+    private int PREF_W = 200;
+    private int PREF_H = PREF_W;
+    private JLabel numberOfShapes = new JLabel("Shapes: 0", JLabel.LEFT);
 
-    // overridden paintComponent method
+    public Drawing(ControllerLogic logic, Shape shape) {
+      this.logic = logic;
+      this.shape = shape;
+      setBackground(Color.LIGHT_GRAY);
+      setBorder(BorderFactory.createTitledBorder("Shape Drawing"));
+      setPreferredSize(new Dimension(PREF_W, PREF_H));
+      add(numberOfShapes, 0);
+    } // end Drawing constructor
+
     @Override
-    public void paintComponent(Graphics graphics) {
-      // draw shape of graphics
-      super.paintComponent(graphics);
-      // checking if the shape is null.
-
+    protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      if (shape != null) {
+        shape.draw(g);
+      } // end if statement
     } // end paintComponent method
 
-    // overridden getPreferredSize method
     @Override
     public Dimension getPreferredSize() {
-
-      // make the dimensions 200 by 200
-      return new Dimension(200, 200);
+      return new Dimension(PREF_W, PREF_H);
     } // end getPreferredSize method
 
-    // drawShape method
+    /**
+     * draws a shape to the graphics pane
+     * @param shape SHAPE current shape object
+     * @throws OutsideBounds
+     */
     public void drawShape(Shape shape) throws OutsideBounds {
-
-      // TODO: check for boundaries
-      // TODO: repaint the shape
-      // TODO: call repaint method
-//      repaint();
+      // if the shape or width is greater than 200
+      if (shape.width > 200 || shape.height > 200) {
+        OutsideBounds exception = new OutsideBounds("Outside Bounds: 200 x 200");
+        JOptionPane.showMessageDialog(this,
+                exception.getMessage(),
+                "Error Creating Shape",
+                JOptionPane.ERROR_MESSAGE);
+        // if the shape, width, x coordinate, or y coordinate are not integers
+      } else {
+        Graphics g = this.getGraphics(); // create new graphics object
+        g.dispose(); // dispose of old object
+        shape.draw(g); // draw the shape
+        numberOfShapes.setText("Shapes: " + shape.getNumberOfShapes());
+        repaint();
+      } // end if/else statement
     } // end drawShape method
+
   } // end Drawing class
 
-  /** OutsideBounds Class - Extends Exception */
+  /**
+   * OutsideBounds class
+   */
   public static class OutsideBounds extends Exception {
-    private int xCoordinate;
-    private int yCoordinate;
-    private int width;
-    private int height;
-
-    /**
-     * Creates OutsideBounds object with Shape information to check against
-     * @param obj SHAPE Shape object with information about
-     *            current shape being processed
-     */
-    public OutsideBounds(Shape obj) {
-      // check to ensure dimensions are within 200 x 200
-      if (!this.checkDimensions(obj)) {
-        // ensure width must be an integer
-        if (((Object)obj.width).getClass().getName() != "java.lang.Integer") {
-          new OutsideBounds("Width must be an Integer");
-        } else {
-          this.width = obj.width;
-        } // end if/else
-        // ensure height is an integer
-        if (((Object)obj.height).getClass().getName() != "java.lang.Integer") {
-          new OutsideBounds("Height must be an Integer");
-        } else {
-          this.height = obj.height;
-        } // end if/else
-      } else {
-        new OutsideBounds("Out of Bounds: 200 x 200");
-      } // end if/else statement
-      // ensure x coordinate is an integer
-      if (((Object)obj.x).getClass().getName() != "java.lang.Integer") {
-        new OutsideBounds("x Coordinate must be an integer");
-      } else {
-        this.xCoordinate = obj.x;
-      } // end if/else statement
-      // ensure y coordinate is an integer
-      if (((Object)obj.y).getClass().getName() != "java.lang.Integer") {
-        new OutsideBounds("y Coordinate must be an integer");
-      } else {
-        this.yCoordinate = obj.y;
-      } // end if/else statement
-    } // end OutsideBounds constructor
+    // TODO: fix the constructor for outside bounds to check for integer types
+    //  to throw error upon user input in text fields
 
     /**
      * Creates a message constructor to alert user to exception
@@ -191,74 +174,266 @@ public class CMIS242DesignPRJ3BryanD {
       super(message);
     } // end OutsideBounds Message Constructor
 
-    /**
-     * Checks to see if dimensions are out of bounds,
-     * limit shapes to 200 x 200
-     * @param obj SHAPE shape object with information about current shape
-     * @return BOOLEAN true/false value
-     */
-    public boolean checkDimensions(Shape obj) {
-      boolean outOfBounds = false;
-      // check to see if dimensions are out of bounds
-      if (obj.width > 200 || obj.height > 200) {
-        outOfBounds = true;
-      } // end if statement
-
-      return outOfBounds;
-    } // end checkDimensions method
-
   } // end OutsideBounds class
 
-  /** ProgramCore class - Extends JFrame */
-  static class ProgramCore extends JFrame {
-    // TODO: Declare attributes for GUI
+  /**
+   * Button Panel class
+   */
+  public static class ButtonPanel extends JPanel {
+    public ControllerLogic logic;
+    private GridLayout buttonLayout = new GridLayout(1, 3);
+    private Button drawBtn = new Button("Draw");
+    private Button clearFieldsBtn = new Button("Clear Fields");
+    private Button exitBtn = new Button("Exit");
 
-    // TODO: Clean up comments for ProgramCore constructor
+    public ButtonPanel(ControllerLogic logic) {
+      this.logic = logic;
+      setLayout(buttonLayout);
+      setBackground(Color.LIGHT_GRAY);
+      setPreferredSize(new Dimension(400, 50));
+      add(drawBtn, 0);
+      add(clearFieldsBtn, 1);
+      add(exitBtn, 2);
+
+      // draw button action event listener
+      drawBtn.addActionListener(e -> {
+        // get the string values of combo boxes
+        String typeOfShape = logic.userInputPanel.shapeTypeBox.getSelectedItem().toString();
+        String fillTypeSelection = logic.userInputPanel.fillTypeBox.getSelectedItem().toString();
+        String colorTypeSelection = logic.userInputPanel.colorBox.getSelectedItem().toString();
+        // convert values to usable objects
+        Color colorType = getColor(colorTypeSelection);
+        boolean isSolid = (fillTypeSelection.equalsIgnoreCase("solid")) ? true : false;
+        // get integer values from input
+        // TODO: create a try catch block to create exception for non integer values
+        try {
+          int widthValue =
+                  checkForErrors(
+                          logic.userInputPanel.widthTextField.getText(), "Width must be an Integer");
+          int heightValue =
+                  checkForErrors(
+                          logic.userInputPanel.heightTextField.getText(), "Height must be an Integer");
+          int xCoordinateValue =
+                  checkForErrors(
+                          logic.userInputPanel.xCoordinateTextField.getText(),
+                          "X Coordinate must be an Integer");
+          int yCoordinateValue =
+                  checkForErrors(
+                          logic.userInputPanel.yCoordinateTextField.getText(),
+                          "Y Coordinate must be an Integer");
+          // create the shape object and paint to screen
+          Shape currentShape = createNewShape(typeOfShape,
+                  colorType, isSolid, widthValue, heightValue, xCoordinateValue, yCoordinateValue);
+          logic.drawing.shape = currentShape;
+          logic.drawing.drawShape(currentShape);
+        } catch (OutsideBounds err) {
+          JOptionPane.showMessageDialog(logic,
+                  err.getMessage(),
+                  "Error Creating Shape",
+                  JOptionPane.ERROR_MESSAGE);
+        }
+
+      }); // end draw button event listener
+      // clear fields action listener
+      clearFieldsBtn.addActionListener(e -> {
+        // reset the user input fields
+        resetFields(logic);
+      }); // end clear fields button event listener
+      // exit button action listener
+      exitBtn.addActionListener(e -> {
+        // end the program
+        System.exit(0);
+      }); // end exit button event listener
+
+    } // end ButtonPanel constructor
+
     /**
-     * Core Program constructor
+     * Creates a new Shape object to be used for painting
+     * @param typeOfShape STRING type of shape
+     * @param color COLOR type of Color
+     * @param fillType BOOLEAN solid/hollow
+     * @param width INT width of object
+     * @param height INT height of object
+     * @param xCoordinate INT x coordinate on plane
+     * @param yCoordinate INT y coordinate on plane
+     * @return SHAPE new shape object
      */
+    private Shape createNewShape(String typeOfShape,
+                                 Color color,
+                                 boolean fillType,
+                                 int width,
+                                 int height,
+                                 int xCoordinate,
+                                 int yCoordinate) {
+      Shape shape = null;
+      Rectangle rectangle = new Rectangle(xCoordinate, yCoordinate, width, height);
+      // check to see if shape is oval
+      if (typeOfShape.equalsIgnoreCase("oval")) {
+        shape = new Oval(rectangle, color, fillType);
+      } else {
+        shape = new Rectangular(rectangle, color, fillType);
+      } // end if/else
+
+      return shape;
+    } // end createNewShape method
+
+    /**
+     * Converts the string representation to a color object
+     * @param color STRING color
+     * @return COLOR Object
+     */
+    private Color getColor(String color) {
+      Color newColor = null;
+      switch (color.toLowerCase()) {
+        case "black":
+          newColor = Color.BLACK;
+          break;
+        case "red":
+          newColor = Color.RED;
+          break;
+        case "orange":
+          newColor = Color.ORANGE;
+          break;
+        case "yellow":
+          newColor = Color.YELLOW;
+          break;
+        case "green":
+          newColor = Color.GREEN;
+          break;
+        case "blue":
+          newColor = Color.BLUE;
+          break;
+        case "magenta":
+          newColor = Color.MAGENTA;
+          break;
+      } // end switch
+      return newColor;
+    } // end getColor method
+
+    /**
+     * Reset the text fields to their original settings
+     * @param logic CONTROLLERLOGIC logic middleware
+     */
+    private void resetFields(ControllerLogic logic) {
+      logic.userInputPanel.shapeTypeBox.setSelectedIndex(0);
+      logic.userInputPanel.fillTypeBox.setSelectedIndex(0);
+      logic.userInputPanel.colorBox.setSelectedIndex(0);
+      logic.userInputPanel.widthTextField.setText("");
+      logic.userInputPanel.heightTextField.setText("");
+      logic.userInputPanel.xCoordinateTextField.setText("");
+      logic.userInputPanel.yCoordinateTextField.setText("");
+    } // end resetFields method
+
+    /**
+     * Check for errors when parsing integers
+     * @param userInput STRING users input from the program
+     * @param message STRING message to display to user
+     * @return INT successfully parsed integer
+     */
+    private int checkForErrors(String userInput, String message) throws OutsideBounds {
+      int currentUserInput = 0;
+      try {
+        currentUserInput = Integer.parseInt(userInput);
+      } catch (NumberFormatException e) {
+        throw new OutsideBounds(message);
+      } // end try/catch
+      return currentUserInput;
+    } // end checkForErrors method
+
+  } // end ButtonPanel class
+
+  /**
+   * User Input Panel class
+   */
+  public static class UserInputPanel extends JPanel {
+    public ControllerLogic logic;
+    private GridLayout userInputLayout = new GridLayout(7, 2);
+    private JLabel shapeTypeLabel = new JLabel("Shape Type", JLabel.CENTER);
+    private JLabel fillTypeLabel = new JLabel("Fill Type", JLabel.CENTER);
+    private JLabel colorLabel = new JLabel("Color", JLabel.CENTER);
+    private JLabel widthLabel = new JLabel("Width", JLabel.CENTER);
+    private JLabel heightLabel = new JLabel("Height", JLabel.CENTER);
+    private JLabel xCoordinateLabel = new JLabel("X Coordinate", JLabel.CENTER);
+    private JLabel yCoordinateLabel = new JLabel("Y Coordinate", JLabel.CENTER);
+    private JTextField widthTextField = new JTextField("");
+    private JTextField heightTextField = new JTextField("");
+    private JTextField xCoordinateTextField = new JTextField("");
+    private JTextField yCoordinateTextField = new JTextField("");
+    private String[] shapeOptions = { "Oval", "Rectangle" };
+    private String[] fillOptions = { "Hollow", "Solid" };
+    private String[] colorOptions = { "Black", "Red", "Orange", "Yellow", "Green", "Blue", "Magenta" };
+    private JComboBox shapeTypeBox = new JComboBox(shapeOptions);
+    private JComboBox fillTypeBox = new JComboBox(fillOptions);
+    private JComboBox colorBox = new JComboBox(colorOptions);
+
+    public UserInputPanel(ControllerLogic logic) {
+      this.logic = logic;
+      setLayout(userInputLayout);
+      setBackground(Color.LIGHT_GRAY);
+      setPreferredSize(new Dimension(200, 200));
+      add(shapeTypeLabel, 0);
+      add(shapeTypeBox, 1);
+      add(fillTypeLabel, 2);
+      add(fillTypeBox, 3);
+      add(colorLabel, 4);
+      add(colorBox, 5);
+      add(widthLabel, 6);
+      add(widthTextField, 7);
+      add(heightLabel, 8);
+      add(heightTextField, 9);
+      add(xCoordinateLabel, 10);
+      add(xCoordinateTextField, 11);
+      add(yCoordinateLabel, 12);
+      add(yCoordinateTextField, 13);
+    } // end UserInputPanel constructor
+
+  } // end UserInputPanel class
+
+  /**
+   * Controller Logic class
+   */
+  public static class ControllerLogic extends JPanel {
+    Shape shape = null;
+    BorderLayout logicLayout = new BorderLayout();
+    ButtonPanel buttonPanel = new ButtonPanel(this);
+    UserInputPanel userInputPanel = new UserInputPanel(this);
+    Drawing drawing = new Drawing(this, shape);
+
+    public ControllerLogic() {
+      setLayout(logicLayout);
+      setBackground(Color.LIGHT_GRAY);
+      setPreferredSize(new Dimension(400, 450));
+      add(userInputPanel, BorderLayout.WEST);
+      add(drawing, BorderLayout.EAST);
+      add(buttonPanel, BorderLayout.SOUTH);
+    } // end ControllerLogic constructor
+
+  } // end ControllerLogic class
+
+  public static class ProgramCore extends JFrame {
+    ControllerLogic logic = new ControllerLogic();
+
     public ProgramCore() {
+      super("Geometric Drawings");
+      setFrame(400, 450);
+      addComponents();
+    } // end ProgramCore constructor
 
-      // GUI parameters
-      // call for the GUI window
-      // GUI buttons
-      // TODO: create action event listener with lambda expression to get rid of methods
-      //  and ensure that constructor is setup properly
-
-
-      //      drawButton.addActionListener(new ActionListener() {
-      //
-      //        // action performed according to user input
-      //        @Override
-      //        public void actionPerformed(ActionEvent e) {
-      //
-      //          // taking data from user input
-      //          // creating the rectangle
-      //          // checking the colors
-      //          // checking the shape type
-      //          // drawing the shape
-      //          // shape count
-      //          drawingPanel.drawShape(shape);
-      //
-      //        }// end actionPerformed
-      //
-      //      }); // end ActionListener
-
-    } // end constructor
-
-    /**
-     * Add the components by drawing the shape
-     */
     private void addComponents() {
-      // TODO: draw the shape
-    } // end addComponents
+      add(logic);
+    } // end addComponents method
+
+    private void setFrame(int width, int height) {
+      setSize(width, height);
+      setLocationRelativeTo(null);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    } // end setFrame method
+
   } // end ProgramCore class
 
-  // main method
   public static void main(String[] args) {
-    // TODO: instantiate new object from ProgramCore
-//    ProgramCore frame = new ProgramCore();
-    // TODO: make the GUI appear
-//    frame.setVisible(true);
-  } // end public static void main
-} // end public class CMIS242DesignPRJ3BryanD
+    ProgramCore frame = new ProgramCore();
+    frame.setVisible(true);
+  } // end main method
+
+} // end CMIS242DesignPRJBryanD
